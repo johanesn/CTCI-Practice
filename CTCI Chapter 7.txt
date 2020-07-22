@@ -1,0 +1,137 @@
+Chapter 7 Cracking the Coding Interview - Object Oriented Design
+
+1. How to Approach
+	a) Handle Ambiguity : go through six Ws --> who, what, where, when, how and why
+
+	b) Define the Core Objects : in restaurant for example, our core objects might be things like Table, Guest, Party, Order, Meal, Employee, Server and Host
+
+	c) Analyze Relationships : Relationship between the objects 
+
+	d) Investigate Actions 
+
+
+2. Design Patterns: Singleton and Factory Method are widely used in interviews
+	a) Singleton pattern ensures that a class has only one instance and ensures access to the instance through application.
+
+	b) Factory Method offers an interface for creating an instance of a class, with its subclasses deciding which class to instantiate. 
+
+
+CTCI Questions:
+
+7.1 Deck of Cards: Design the data structures for a generic deck of cards. Explain how you would sublcass the data structures to implement blackjack 
+
+- important to ask what is meant by generic (can mean many things) ; assume that the deck is a 52-card set
+
+- can write class with generics but restricted the type of T to card
+
+7.4 Parking Lot: Design a parking lot using object - oriented principles
+
+- The question is too vague, requires you to have a conversation with your interviewer, about what types of vehicles it can support, whether the parking lot has multiple levels and so on.
+
+- Assumptions :
+	1. The parking lot has multiple levels. Each level has multiple rows of spots.
+	2. The parking lot can park motorcycles, cars and buses.
+	3. The parking lot has motorcycles spots, compact spots and large spots.
+	4. Motorcycle can park in any spot.
+	5. A car can park in either a single compact spot or a single large spot.
+	6. A bus can park in five large spots that are consecutive and within the same row.
+
+- ParkingLot class is essentially wrapper class for an array of Levels
+
+public enum VehicleSize {Motorcycle, Compact, Large}
+
+public abstract class Vehicle { ... }
+
+public class Bus extends Vehicle { ... }
+
+public class Car extends Vehicle { ... }
+
+public class Motorcycle extends Vehicle { ... }
+
+public class ParkingLot { ... }
+
+public class Level { ... }
+
+public class ParkingSpot { ... }
+
+
+7.7 Chat Server : Explain how you would design a chat server. In particular, provide details about the various backend components, classes and methods. What would be the hardest problems to solve?
+
+- Focus on core management : adding a user, creating conversation, updating status and so on. 
+
+- Specific actions does it need to support? 
+	1. Signing online and offline
+	2. Add requests (sending, accepting, and rejecting)
+	3. Updating a status message
+	4. Creating private and group chats
+	5. Adding new message to private and group chats
+
+- Core components of the system? database (MySQL or BigTable or similar system), set of clients (communication can use XML because easy to scalable and debug) and set of servers. 
+
+- Key objects and methods? 
+
+// UserManager serves as central place for core user actions 
+public class UserManager {
+	private HashMap <Integer,User> usersById;
+	private HashMap <String, User> usersByAccountName 
+	...
+
+	public void addUser () { ... }
+	public void approveAddRequest () { ... }
+	public void rejectAddRequest () { ... }
+	public void userSignedOn () { ... }
+	public void userSignedOff ()  { ... }
+}
+
+...
+
+- What problems would be the hardest to solve (or most interesting)?
+	1. How do we know if someone is online, I mean, really, really know?
+	2. How do we deal with conflicting information? 
+	3. How do we make our server scale?
+	4. How we do prevent denail of service attacks? 
+
+7.9 Circular Array : Implement CircularArray class that supports an array-like data structure which can be efficiently rotated. If possible class should use a generic type (also called template). and should support iteration via the standard for (Obj o : circular array) notation
+
+class CircularArray(object):
+	def __init__ (self, array):
+		self.array = array
+		self.start = 0
+
+	def rotate (self, i):
+		self.start = (self.start + i) % len(self.array)
+
+	def __iter__(self):
+		for i in range (self.start, len(self.array)):
+			yield self.array[i]
+
+		for i in range (0. self.start):
+			yield self.array[i]
+
+	def __getitem__(self, i):
+		return self.array((self.start + i) % len(self.array))
+
+	def __setitem__(self, i, item):
+		self.array[(self.start + i) % len(self.array)] = item
+
+	def __delitem__(self, i):
+		del self.array[(self.start + i ) % len(self.array)]
+
+		if (self.start + 1)%len(self.array) < self.start : 
+			self.start = self.start - 1
+
+
+7.11 File System: Explain the data structures and algorithms that you would use to design an in-memory file system. Illustrate with an example in code where possible.
+- File system in its most simplistic version, consists of Files and Directories. Each Directory contains a set of Files and Directories. Since Files and Directories share so many characteristics, we have impelmented them such that they inherit from the same class, Entry.
+
+public abstract class Entry { ... }
+
+public class Files extend Entry { ... }
+
+public class Directory extend Entry { ... }
+
+
+7.12 Hash Table : Design and implement a hash table which uses chaining (linked list) to handle collisions 
+- Has done this before 
+
+

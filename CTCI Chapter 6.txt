@@ -1,0 +1,60 @@
+Chapter 6 Cracking the Coding Interview - Math and Logic Puzzles
+
+0. You have two ropes, and each takes exactly one hour to burn. How would you use them to time exactly 15 minutes? Note that the ropes are uneven densities, so half the rope length-wise does not necessarily take half an hour to burn.
+
+Solution : 1. Light rope 1 at both ends and rope 2 at one end
+		   2. When two flames on rope 1 meet, 30 minutes will have passed. Rope 2 has 30 minutes left of burn time
+		   3. At that point, light rope 2 at the other end
+		   4. In exactly fifteen minutes, rope 2 will be completely burnt
+
+
+1. The Heavy Pill : You have 20 bottles of pills. 19 bottles have 1.0 gram pills, but one has pills of weight 1.1 grams. Given a scale that provides an exact measurement, how would you find the heavy bottle?
+
+Solution: Pick 1 pill from bottle 1, 2 pills from bottle 2, 3 pills from bottle 3, ... 20 pills from bottle 20. Which totals in 1 + 2 + 3 + 4 + ... + 20 = 20 * 21 /2 = 210. So if the total is 211.3 grams, then it means, the heavy pills come from bottle 13. 
+
+Formula : (weight - 210 grams) / 0.1 grams
+
+2. Basketball : You have a basketball hoop and someone says that you can play one of two games. 
+
+Game 1 : You get one shot to make the hoop
+Game 2 : You get three shots and you have to make two of three shots.
+
+if p is probability of making a particular shot, for which values of p should you pick one game or the other? 
+
+Solution:
+
+Probability of winning game 1: it is p by definition
+
+Probability of winning game 2: 
+	Let s(k, n) be the probability of making exactly k shots out of n. 
+
+	P(winning) = s(2, 3) + s(3, 3) = 3p^2 - 2p^3 with 
+
+	s(3, 3) = p^3 
+	s(2, 3) = P(making 1 and 2, missing 3) + P(making 1 and 3, missing 2) + P(missing 1, making 2 and 3) = p * p * (1-p) + p * (1-p) * p + (1-p) * p * p = 3 (1-p) p^2
+
+Which games should i play? 
+
+You should play game 1 if P(Game 1) > P(Game 2)
+
+3. Dominos : Lay an entire 31 dominos on 8x8 chessboard in which two diagonally opposite corners have been cut off --> impossible
+
+4. Ants on a Triangle : There are three ants on different vertices of a triangle. What is the probability of collision if they start walking on the sides of triange? Assume that each ant randomly picks a direction, with either direction being equally likely to be chosen and that they walk at the same speed. Similarly, find the probability of collision with n ants on an n-vertex polygon.
+
+Solution : The ants will not have collision if they move on the same direction
+		   P (clockwise) = (1/2)^3 
+		   P (counterclockwise) = (1/2)^3
+		   P (not collision) = (1/2)^3 + (1/2)^3 = 1/4
+		   P (collision) = 1 - 1/4 = 3/4
+
+		   n-vertex polygon = 1 - (1/2)^(n-1)
+
+5. Jugs of Water: You have a five-quart jug, a three-quart jug, and an unlimited supply of water (but no measuring cups). How would you come up with exactly four quarts of water? Note that the jugs are oddly shaped, such that filling up exactly half of the jug would be impossible. 
+
+6. Blue-eyed island: A bunch of people are living on an island, when a visitor comes with a strange order: all blue-eyed people must leave the island as soon as possible. There will be a fight out at 8:00 pm every evening. Ech person can see everyone else's eye color, but they do not know their own (nor is anyone allowed to tell them). Additionally, they do not know how many people have blue eyes, although they do know that at least one person does. How many days will it take the blue - eyed people to leave?
+
+Solution : equal to the number of blue-eyed people
+
+
+
+
