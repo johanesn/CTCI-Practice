@@ -1,0 +1,97 @@
+Chapter 9 Cracking The Coding Interview - System Designs and Scalability
+
+If we were asked by manager to design some system, what would you do?
+	- Ask questions
+	- Engage interviewer 
+	- Discuss tradeoffs
+
+1. Handling the Questions
+	- Communicate
+	- Go broad first
+	- Use the whiteboard
+	- Acknowledge interviewer concerns
+	- Be careful about assumptions
+	- State your assumptions explicitly
+	- Estimate when necessary 
+	- Drive
+
+2. Design : Step by Step
+	- Step 1 : Scope the Problem
+		> You will want to understand what exactly you need to implement (i.e. tiny URL)
+	- Step 2 : Make Reasonable Assumptions
+	- Step 3 : Draw the Major Components
+		> Walk through your system from end-to-end to provide a flow. A user enters a new URL. Then what?
+	- Step 4 : Identify the Key Issues
+		> One situation you might consider is that while some URLs will be infrequently accessed, others can suddenly peak.
+	- Step 5 : Redesign for the key issues
+		> Once you have identified the key issues, time to adjust your design for it
+
+3. Algorithms that Scale : Step-by-Step
+	- Step 1 : Ask Questions
+	- Step 2 : Make Believe 
+	- Step 3 : Get Real
+	- Step 4 : Solve Problems 
+
+4. Key Concepts (deep and complex topics)
+	- Horizontal vs. Vertical Scaling
+		> Vertical means increasing the resources of a specific node. For example, add additional memory to a server to improve its ability to handle load changes
+		> Horizontal means increasing the number of nodes. For example, add additional servers 
+
+	- Load Balancer 
+		> Allows a system to distribute the load evenly
+
+	- Database Denormalization and NoSQL
+		> Avoid joins in a relational database (very slow as system grows bigger)
+		> Denormalization means adding redundant information into a database to speed up reads
+
+	- Database Partitioning (Sharding)
+		> Sharding means splitting the data across multiple machines while ensuring you have a way of figuring out which data is on which machine
+		> A few common ways include:
+			a. Vertical Partitioning : Partitioning by feature. weakness is if one of the tables get very large, you might need to repartition
+			b. Key-based Partitioning: Use id to partition it. If you have N servers, put data on mod (key, n). Weakness is number of servers you have is effectively fixed. 
+			c. Directory-Based Partitioning: Maintain a lookup table.  
+
+	- Caching
+	- Asynchronous Processing and Queues
+	- Networking Metrics
+		> Bandwidth: This is the amount of data that can be transferred in a unit of time
+		> Throughput: The actual amount of data that is transferred
+		> Latency: How long it takes data to go from one end to the other (delay)
+
+	- MapReduce 
+		> Requires you to write a Map Step and a Reduce Step (<key, value> pair)
+
+5. Considerations 
+	- Failures 
+	- Availability and Reliability
+	- Read-heavy vs. Write-heavy
+	- Security 
+
+6. There is no "perfect" system
+	- Always has trade-off
+
+7. Example Problem
+	- Given a list of millions of documents, how would you find all documents that contain a list of words? The words can appear in any order, but they must be complete words. That is, "book" does not match "bookkeeper"
+		> Before we start, we have to know whether this is one time only operation or repeated. If repeated, we can accept the burden of pre - processing
+		> Step 1 : Pretend we just have a few dozen documents. How would we implement the function?
+
+		One way is to do this is pre-process each document and create a hash table index. This hash table would map from a word to a list of documents that contain that word
+			"books" -> {doc2, doc3, doc6, doc8}
+			"many"  -> {doc1, doc3, doc7, doc8, doc9}
+
+		To search "many books", we would simply do an intersection -> {doc3, doc8}
+
+		> Step 2 : Back to original problem (million of documents). May need to divide up the documents across many machines. 
+
+		This division introduces the following key concerns:
+			a. How to divide up our hash table?
+			b. We may need to process a document on one machine and push the results off to other machines
+			c. We will need a way of knowing which machine holds a piece of data. What does the table look like or where is it stored?
+
+		> Step 3 : Find solutions
+			a. One solution is to divide up the words alphabetically by keyword such that each machine controls range of words.
+			b. Implement a simple algorithm in which we iterate thorugh the keywords alphabetically storing as much data as possible on one machine. move to next machine after full --> advantage is lookup table is small but disadvantage is if new documents or words are added, may need to perform an expensive shift of keywords
+			c. To find all documents that match a list of strings, sort the list and send each machine a lookup request 
+			d. Final step is to perform intersection on these document list
+
+
