@@ -69,7 +69,7 @@ If we were asked by manager to design some system, what would you do?
 
 6. There is no "perfect" system
 	- Always has trade-off
-
+				
 7. Example Problem
 	- Given a list of millions of documents, how would you find all documents that contain a list of words? The words can appear in any order, but they must be complete words. That is, "book" does not match "bookkeeper"
 		> Before we start, we have to know whether this is one time only operation or repeated. If repeated, we can accept the burden of pre - processing
@@ -94,4 +94,145 @@ If we were asked by manager to design some system, what would you do?
 			c. To find all documents that match a list of strings, sort the list and send each machine a lookup request 
 			d. Final step is to perform intersection on these document list
 
+Interview Questions:
 
+9.1 Stock Data: Imagine you are building some sort of service that will be called by up to 1000 client applications to get simple end-of-day stock price information (open, close, high, low). You may assume that you already have the data and you can store it in any format you wish. How would you design the client-facing service that provides the information to client applications? You are responsible for the development, rollout, and ongoin monitoring and maintenance of the feed. Describe the different methods you considered and why you would recommend your approach. Your service can use any technologies you wish and can distribute the information to the client applications in any mechanism you choose.
+- Proposal 1: can use basic .txt files
+- Proposal 2: use sql database 
+- Proposal 3: XML data
+
+9.2 Social Network: How would you design the data structures for a very large social network like Facebook or LinkedIn? Describe how you would design an algorithm to show the shortest path between two people?
+> First, simplify the problems. ignore million users
+	- let each person as a node and edge as the connection if they are friends
+	- use BFS (why not DFS?)
+	- alternatively Bidirectional BFS. If search collide. shortest path has been found
+
+	################ code ################
+
+	How faster the above code (biBFS) is?
+
+	suppose every person has k friends and node S and node D have friend C in common.
+
+	- traditional BFS from S to D: go through roughly k+k*k nodes (each of S's k friends and then each of their k friends)
+	- BiBFS: go through 2k nodes (each of S's friends and each of D's k friends)
+		>> 2k < k + k*k nodes
+
+	- Generalizing this to a path of length q:
+		>> BFS : O(k^q)
+		>> BiBFS : O(k^q/2 + k^q/2) = O(k^q/2)
+
+> Second, handle the million users	
+	- We cannot keep all of our data on the same machine
+		1. For each friend ID: int machine_index = getMachineIDforUser (personID);
+		2. Go to #machine_index
+		3. On that machine, do Perso friend = getPersonWithID(person_id);
+
+Optimization -> how to reduce machine jumps
+				smart division of people and machines
+
+9.3 Web Crawler: If you were designing a web crawler, how would you avoid getting into infinite loops?
+- need to detect cycles by create hash table where hash[v] = True after we visit page v
+- what does it mean by visit page v? is page v defined based on its content or its url?
+- biggest problem is there is no perfect way to define a "different" page. need to have some sort of estimation for degree of similarity. 
+- One way to tackle this is by having a database to see whether anything with this signature has been crawled recently. On each iteration, select the highest priority. Then do the following:
+	1. open up the page and create a signature of the page based on specific subsection and url
+	2. query the database to see whether the signature has been crawled recently.
+	3. if has been crawled recently, insert this page back to database with low priority
+	4. if not, insert its link to database
+
+9.4 Duplicate URLs: You have 10 billion URLs. How do you detect duplicate documents? In this case, assume "duplicate" means that the URLs are identical.
+- ask how much does 10 billion urls take up? if each url is an avg 100 char -> each char 4 bytes --> total 400 TB (cannot hold that much in memory). If it holds up, use hash table maps to True if already found elsewhere ! if cannot?
+
+> Solution 1: Disk Storage
+> Solution 2: Multiple machines
+	- rather than storing url u mapped to <x>.txt where x = hash(u), we would send the URL to machine x.
+	- pro: can be paralleled ; cons: may need to handle failure 
+
+9.5 Cache: Imagine a web server for a simplified search engine. This system has 100 machines to respond to search queries, which may then call out using processSearch(string query) to another cluster of machines to actually get the result. The machine which responds to a given query is chosen at random, so you cannot guarantee that the same machine will always respond to the same request. The method processSearch is very expensive. Design a caching mechanism for the most recent queries. Be sure to explain how you would update the cache when the data changes.
+> Assumptions:
+	- number of queries we wish to cache is large (millions)
+	- calling between machines is relatively quick
+	- result for a given query is an ordered list of URLs, 50 char title and 200 char summary
+	- most popular queries are extremely popular -> would always appear in cache
+
+> System requirements:
+	- efficient lookup
+	- expiration of old data -> replace with new data
+
+> Step 1: Design a cache for Single System 
+	- use linked list to easier purging old data and hash map for quick lookup. Best solution? merge those two !
+	- map query to front-est node in linked list!
+
+> Step 2: Expand to many machines
+	has several options !
+	- Option 1: Each machine has its own cache (query 'foo' sent to machine 1 twice, then the second one can get from cache. If sent to machine 1 first and machine 2 -> fresh and different)
+	- Option 2: Each machine has a copy of the cache (when items are added to cache, distributed to each machine. major drawback: need NxN much space)
+	- Option 3: Each machine stores a segment of the cache 
+
+> Step 3: Updating results when contents change
+	- if cache too large, and queries are popular, they might be stored permanently there! need to update periodically! Question is, how to define 'content changes'(discuss with the interviewer)?
+
+	- usually it will be:
+		1. the content at URL changes (or the page at that URL is removed)
+		2. the ordering of results change 
+		3. new page appear related to a particular query --> implement automatic timeout
+
+> Step 4: Further Enhancements 
+	- handle very particular queries (rather than having machine i to send request to machine j every time, machine i could forward just once)
+9.6. Sales Rank: A large eCommerce company wishes to list the best-selling products, overall and by category. For example, one product might be the #1056th best-selling product overall but the #13th best-selling product under "Sports Equipment" and the #24th best-selling product under "Safety". Describe how you would design this system. 
+> Step 1: Scope the Problem
+	Need to define exactly what we are building
+	- only need to design the relevant component and not the entire eCommerce system. 
+	- define what the sales rank means
+	- assume each product can be in multiple categories
+
+> Step 2: Make Reasonable Assumptions
+	- stats dont need to be 100% up-to-date (can be up to an hour old for most popular items and one day for less popular one)
+	- precision is important for most item but a small degree of error is okay
+	- based strictly on the origin of transaction (not the price or date)
+
+> Step 3: Draw the Major Components
+	- purchase system -> database -> sales rank (sort) -> frontend
+
+> Step 4: Identify the Key Issues 
+	- analytics are expensive !! 
+	- use circular array (updated everyday as well as the total count)
+	- batch up number of database writes (not always at every purchase)
+
+
+9.7. Personal Financial Manager: Explain how you would design a personal financial manager (like Mint.com). This system would connect to your bank accounts, analyze your spending habits, and make recommendations. 
+> Step 1: Scope the problem  
+	- you can create an account and add bank accounts (multiple)
+	- it pulls in all your financial history (or as much as your bank allow)
+	- include outgoing, incoming money and current money
+	- each payment transaction has a "category" associated with it
+	- assume this is just website for now (could potentially talk about mobile app as well)
+	- want email notification either on regular basis or on certain conditions 
+
+> Step 2: Make Reasonable Assumptions
+	- Adding or removing bank account is relatively unusual 
+	- Write heavy 
+	- System will never reassign a transaction to a different category "behind the scenes"
+	- Bank probably won't push data to our system (pull data from the banks)
+	- Alert to user for exceeding budgets do not need to be sent instantaenously (can be 24 hours later)
+
+> Step 3: Draw the major components 										
+	- bank data synchronizer -> raw transaction data -> categorizer -> categorized transactions <-> frontend <-> budget data
+	- bank data is pulled at periodic times (frequency depends on user behavior)
+
+> Step 4: Identify the key issues
+	- data-heavy system (want it to feel snappy and responsive) -> asynchronous
+	- we will want to at least have one task queue 
+	- tasks will likely to have priority associated with them (some need to be performend more often than others)
+	- email system. use a task to regularly crawl user data to check if they're exceeding their budget
+	- incorporating knowledge that a system like this will probably have a large number of inactive users (need to remove or deprioritize them)
+	- biggest bottleneck in our system will likely be the massive amount of data that needs to be pulled and analyzed. 
+
+> Categorizer and Budget Analyzer 
+	- Only the final data (the categorized transactions and the budget analysis will be stored in database) -> minimize writing and reading from database 
+
+> User Changing Categories 
+	- will need to recompute 
+
+9.8. Pastebin: Design a system like a Pastebin, where a user can enter a piece of text and get randomly generated URL to access it. (Hint 165, 184, 206, 232)
+- look at the ctci solutions direcly, lazy to read
