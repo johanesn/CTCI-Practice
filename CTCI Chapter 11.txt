@@ -1,0 +1,61 @@
+Cracking the Coding Interview Chapter 11
+
+11.1. Mistake: Find the mistake(s) in the following code:
+
+unsigned int i;
+for (i=100 ; i >= 0 ; --i)
+	printf("%d\n", i);
+
+- note that unsigned int is by definition always greater than or equal to zero. The loop condition  will therefore always be true, and it will loop indifinitely 
+
+11.2. Random Crashes: You are given the source to an application which crashes when it is run. After running it ten times in a debugger, you find it never crashes in the same place. The application is single threaded and uses only the C standard library. What programming could be causing this crash? How would you test each one?
+
+a) Random Variable: The application might use some random number or variable component that may not be fixed every execution of the program
+
+b) Unitialized Variable: may cause it to take arbitrary value 
+
+c) Memory Leak: may run out of memory
+
+d) External Dependencies: may depend on another application, machine or resource 
+
+11.3. Chess Test:  We have the following method used in a chess game: boolean canMoveTo(int x, int y). This method is part of the Piece class and returns whether or not the piece can move to position(x, y). Explain how you would test this method.
+
+a) Testing Type #1: Extreme Case Validation 
+	- Test with negative number x and y
+	- Test with x larger than the width
+	- Test with y larger than the height
+	- Test with a completely full board
+	- Test with an empty or nearly empty board
+	- Test with far more white pieces than black
+	- Test with far more black pieces than white
+
+	Ask interviewer to return false or throw exception
+
+b) Testing Type #2: General Testing
+
+11.4. No Test Tools: How would you load test a webpage without using any test tools?
+
+Load tesing helps to identify a web application's max operating capacity and bottlenecks
+To perform load testing, identify the criteria including:
+	- Response Time
+	- Throughput
+	- Resource Utilization
+	- Maximum Load that the system can bear
+
+In the absence of formal testing tools -> create our own (simulate concurrent users by creating thousands of virtual users)
+
+11.5. Test a Pen: How would you test a pen?
+
+11.6. Test an ATM: How would you test an ATM in a distributed banking system?
+
+a) Clarify assumptions:
+	- who is going to use the ATM? anyone? blind people? or any number of other answers?
+	- what are they going to use it for? withrawing money? transferring money? checking balance?
+	- what tools do we have to test? do we have access to the code or just atm?
+
+b) Break down the problem into different test-able components
+	- Logging in
+	- Withdrawing money
+	- Depositing money
+	- Checking balance
+	- Transfering money
